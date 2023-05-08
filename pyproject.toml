@@ -3,9 +3,9 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "edwh-demo-tasks-plugin"
+name = "edwh-sshkeys-plugin"
 dynamic = ["version"]
-description = 'Demo project with a plugin to be discovered from the edwh package'
+description = 'plugin for adding and removing keys to servers'
 readme = "README.md"
 requires-python = ">=3.7"
 license = "MIT"
@@ -27,16 +27,16 @@ classifiers = [
 dependencies = ['invoke']
 
 [project.urls]
-Documentation = "https://github.com/remcoboerma/edwh-demo-tasks-plugin#readme"
-Issues = "https://github.com/remcoboerma/edwh-demo-tasks-plugin/issues"
-Source = "https://github.com/remcoboerma/edwh-demo-tasks-plugin"
+Documentation = "https://github.com/remcoboerma/edwh_sshkey_plugin#readme"
+Issues = "https://github.com/remcoboerma/edwh_sshkey_plugin/issues"
+Source = "https://github.com/remcoboerma/edwh_sshkey_plugin"
 
 # https://packaging.python.org/en/latest/guides/creating-and-discovering-plugins/#using-package-metadata
 [project.entry-points."edwh.tasks"]
-demo = "edwh_demo_plugin.demo_plugin"
+sshkey = "edwh_sshkey_plugin.sshkey_plugin"
 
 [tool.hatch.version]
-path = "src/edwh_demo_plugin/__about__.py"
+path = "src/edwh_sshkey_plugin/__about__.py"
 
 [tool.hatch.envs.default]
 dependencies = [
@@ -66,7 +66,7 @@ dependencies = [
   "ruff>=0.0.243",
 ]
 [tool.hatch.envs.lint.scripts]
-typing = "mypy --install-types --non-interactive {args:src/edwh_demo_plugin tests}"
+typing = "mypy --install-types --non-interactive {args:src/edwh_sshkey_plugin tests}"
 style = [
   "ruff {args:.}",
   "black --check --diff {args:.}",
@@ -132,7 +132,7 @@ unfixable = [
 ]
 
 [tool.ruff.isort]
-known-first-party = ["edwh_demo_plugin"]
+known-first-party = ["edwh_sshkey_plugin"]
 
 [tool.ruff.flake8-tidy-imports]
 ban-relative-imports = "all"
@@ -142,16 +142,16 @@ ban-relative-imports = "all"
 "tests/**/*" = ["PLR2004", "S101", "TID252"]
 
 [tool.coverage.run]
-source_pkgs = ["edwh_demo_plugin", "tests"]
+source_pkgs = ["edwh_sshkey_plugin", "tests"]
 branch = true
 parallel = true
 omit = [
-  "src/edwh_demo_plugin/__about__.py",
+  "src/edwh_sshkey_plugin/__about__.py",
 ]
 
 [tool.coverage.paths]
-edwh_demo_plugin = ["src/edwh_demo_plugin", "*/edwh-demo-plugin/src/edwh_demo_plugin"]
-tests = ["tests", "*/edwh-demo-plugin/tests"]
+edwh_sshkey_plugin = ["src/edwh_sshkey_plugin", "*/edwh_sshkey_plugin/src/fabfile"]
+tests = ["tests", "*/edwh_sshkey_plugin/tests"]
 
 [tool.coverage.report]
 exclude_lines = [
