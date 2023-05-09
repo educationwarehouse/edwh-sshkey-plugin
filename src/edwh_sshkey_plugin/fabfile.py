@@ -1,7 +1,6 @@
 from fabric import task
 from datetime import datetime
 from yaml.loader import SafeLoader
-from pprint import pprint
 import pathlib
 import yaml
 import time
@@ -331,7 +330,6 @@ def list(c):
     if len(c.run("ls ~/.ssh/authorized_keys", warn=True, hide=True).stdout) > 0:
         remote_keys = c.run("cat ~/.ssh/authorized_keys", hide=True).stdout
     else:
-        # print("[WARNING] remote authorized_keys not found!")
         remote_keys = ""
 
     # Iterate through the keys and separate them into two lists
@@ -359,6 +357,7 @@ def list(c):
 
     if unrecognized_keys:
         print("\033[1mUnrecognized keys found in remote auth_keys:\033[0m")
+        # If there are unrecognized keys, print them with a number, so you can see how many there are.
         for index in range(len(unrecognized_keys)):
             print(f"key {index+1}")
             print(unrecognized_keys[index])
