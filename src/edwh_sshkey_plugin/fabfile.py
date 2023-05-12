@@ -148,6 +148,10 @@ def remote_key_doesnt_exist(c, command_line_keys, all_key_information):
     # Here is the '-' replaced with a space, so it can be used in the generate function.
     # The generate function requires two out of three arguments to be filled in. So that's why the key is split.
     for which_key in not_in_yaml_keys:
+        if "-" not in which_key:
+            print(f"\033[1m{which_key}\033[0m isn't a valid host-name please give it up with the format: owner-hostname-goal")
+            continue
+
         new_key = which_key.replace("-", " ")
 
         # Create the key that isn't in the YAML file.
@@ -163,13 +167,17 @@ def remote_key_doesnt_exist(c, command_line_keys, all_key_information):
                 print("Please give up a message for the next time!")
                 exit(1)
             key_split = new_key.split()
+
+            if len(key_split) > 3:
+                print(f"to many arguments given in the key: {which_key} format needs to be: owner-hostname-goal")
+
             # This is to create a new key, the split is to make sure that the key is in the right format.
             generate(
                 c,
                 generate_message,
                 owner=key_split[0],
                 hostname=key_split[1],
-                goal=new_key.split()[2] if len(new_key.split()) == 3 else "",
+                goal=new_key.split()[2] if len(key_split) == 3 else "",
             )
             # eventually it will add the keys that are just created
             add_to_remote(c, command_line_keys)
