@@ -11,7 +11,7 @@ from src.edwh_sshkey_plugin import fabfile
 
 class TestYourModule(unittest.TestCase):
     def test_create_new_keyholder(self):
-        fabfile.create_new_keyholder()
+        fabfile.YAML_KEYS_PATH.touch()
         # Assert that the file was created successfully
         self.assertTrue(fabfile.YAML_KEYS_PATH.exists())
 

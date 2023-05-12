@@ -3,7 +3,6 @@ from datetime import datetime
 from yaml.loader import SafeLoader
 import pathlib
 import yaml
-import time
 import os
 import subprocess
 import platform
@@ -12,34 +11,23 @@ import platform
 YAML_KEYS_PATH = pathlib.Path("~/.ssh/known_keys.yaml").expanduser()
 
 
-def create_new_keyholder():
-    """
-    When a user wants to add a keys for the first time, this function will be called.
-    It's to create a new yaml file where the keys will be stored.
-    """
-    with open(YAML_KEYS_PATH, "x") as new_key_holder:
-        new_key_holder.close()
-
-
 def create_new_yaml_file_if_not_exists():
     """
     Checks if the yaml file exists, if not it will create a new one.
     """
     if not YAML_KEYS_PATH.exists():
-        create_new_keyholder()
+        YAML_KEYS_PATH.touch()
 
 
 def open_new_keyholder(read: bool):
     """
     To open the yaml file, this function will be called.
     """
-    if YAML_KEYS_PATH.exists():
-        return open(YAML_KEYS_PATH, "r" if read else "w")
-    else:
-        create_new_keyholder()
+    create_new_yaml_file_if_not_exists()
+    return YAML_KEYS_PATH.open("r" if read else "w")
 
 
-def get_keys_from_keyholder():
+def get_keys_from_keyholder() -> dict:
     """
     This function retrieves keys from a keyholder.
 
@@ -57,7 +45,7 @@ def get_keys_from_keyholder():
         print(
             "functionality for generating local keys automaticly and adding them to the keyholder currently isn't supported"
         )
-        print("please run create to generate a new key")
+        print("please run `ew sshkey.generate` to generate a new key")
         exit(255)
     # This returns a dictionary of keys from the keyholder.
     return dict(key_db.setdefault("keys"))
@@ -94,18 +82,9 @@ def add_keys_to_remote(c, command_line_keys, all_key_information):
         if command_line_key not in all_key_information:
             break
 
-        all_key_information_remote_items = dict(
-            all_key_information[command_line_key].items()
-        )
+        all_key_information_remote_items = all_key_information[command_line_key]
 
-        keys = [
-            name
-            for name in ["key", "datetime", "who@hostname", "message"]
-            if name in all_key_information_remote_items
-        ]
-
-        # 4 as in the 4 items in the dictionary above (key, datetime, who@hostname, message)
-        if len(keys) == 4:
+        if all(attr in all_key_information_remote_items for attr in ("key", "datetime", "who@hostname", "message")):
             # It puts the keys in the authorized_keys file on the remote server.
             # So the public key is now on the remote server.
             # This means that the user can now log in to the remote server using the private key.
@@ -115,11 +94,8 @@ def add_keys_to_remote(c, command_line_keys, all_key_information):
             # This is a way to check if the key is already in the authorized_keys file.
             # By making another file with all the keys and call the function 'sort -u' on it.
             # This function sorts the keys and removes duplicates.
-            c.run("touch ~/.ssh/keys")
             c.run("sort -u ~/.ssh/authorized_keys > ~/.ssh/keys")
-            time.sleep(1)
-            c.run("cp ~/.ssh/keys ~/.ssh/authorized_keys")
-            c.run("rm ~/.ssh/keys")
+            c.run("mv ~/.ssh/keys ~/.ssh/authorized_keys")
             print(
                 f"It worked out! The \033[1m{command_line_key}\033[0m key is added to the remote server."
             )
@@ -206,7 +182,7 @@ def add_to_remote(c, keys_to_remote: list):
         keys_to_remote = [keys_to_remote]
 
     # check which keys are already in the YAML file
-    all_key_information = dict(get_keys_from_keyholder())
+    all_key_information = get_keys_from_keyholder()
 
     # check if given keys exist else ask to generate them
     key_count = get_key_count(all_key_information.keys(), keys_to_remote)
@@ -228,7 +204,7 @@ def delete_remote(c, keys_to_remote):
     Removes the specified SSH key(s) from the remote machine. You can remove multiple keys at once.
     """
     # If keys_to_remote is a string, convert it to a list with a single element
-    if type(keys_to_remote) == str:
+    if isinstance(keys_to_remote, str):
         keys_to_remote = [keys_to_remote]
 
     # Get all key information from the keyholder
@@ -241,9 +217,7 @@ def delete_remote(c, keys_to_remote):
             break
 
         # Get the SSH key from all_key_information and remove newlines
-        ssh_key = dict(all_key_information[command_line_key].items())["key"].replace(
-            "\n", ""
-        )
+        ssh_key = all_key_information[command_line_key]["key"].strip()
         # Remove the key from the remote server's authorized_keys file
         c.run(f'grep -v "{ssh_key}" ~/.ssh/authorized_keys > ~/.ssh/keys')
         c.run("mv ~/.ssh/keys ~/.ssh/authorized_keys")
@@ -273,9 +247,9 @@ def generate(c, message, owner="", hostname="", goal=""):
     create_new_yaml_file_if_not_exists()
 
     # Create a key name by joining the non-empty values of owner, hostname, and goal with a hyphen
-    key_name = "-".join(filter(bool, [owner, hostname, goal]))
+    key_name = "-".join(_ for _ in (owner, hostname, goal) if _)
     # If less than two of three from owner, hostname, and goal are provided, print an error message and return
-    if sum([owner != "", hostname != "", goal != ""]) < 2:
+    if '-' in key_name:
         print(
             "Please provide at least two of the following arguments: Owner, Hostname, goal"
         )
