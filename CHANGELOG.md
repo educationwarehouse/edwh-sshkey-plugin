@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v0.1.2 (2023-05-12)
+### Fix
+* Prevents an error on list of an empty key file. ([`6369365`](https://github.com/educationwarehouse/edwh-sshkey-plugin/commit/6369365def512e55c7cc1eba43940d6bea840fef))
+
 ## v0.1.1 (2023-05-12)
 ### Fix
 * Some small docs changes ([`94445e2`](https://github.com/educationwarehouse/edwh-sshkey-plugin/commit/94445e2968148e18eaddd14506e8eb1c0b7bd6e9))
