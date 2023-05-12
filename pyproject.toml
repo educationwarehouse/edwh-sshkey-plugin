@@ -3,22 +3,21 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "edwh-sshkeys-plugin"
+name = "edwh-sshkey-plugin"
 dynamic = ["version"]
 description = 'plugin for adding and removing keys to servers'
 readme = "README.md"
-requires-python = ">=3.7"
+requires-python = ">=3.10"
 license = "MIT"
 keywords = []
 authors = [
   { name = "Remco Boerma", email = "remco.b@educationwarehouse.nl" },
+  { name = "Sven Keimpema", email = "sven.k@educationwarehouse.nl" },
+  { name = "Romy Schöller", email = "romy.s@educationwarehouse.nl" },
 ]
 classifiers = [
   "Development Status :: 4 - Beta",
   "Programming Language :: Python",
-  "Programming Language :: Python :: 3.7",
-  "Programming Language :: Python :: 3.8",
-  "Programming Language :: Python :: 3.9",
   "Programming Language :: Python :: 3.10",
   "Programming Language :: Python :: 3.11",
   "Programming Language :: Python :: Implementation :: CPython",
@@ -33,7 +32,7 @@ Source = "https://github.com/remcoboerma/edwh_sshkey_plugin"
 
 # https://packaging.python.org/en/latest/guides/creating-and-discovering-plugins/#using-package-metadata
 [project.entry-points."edwh.tasks"]
-sshkey = "edwh_sshkey_plugin.sshkey_plugin"
+sshkey = "edwh_sshkey_plugin.fabfile"
 
 [tool.hatch.version]
 path = "src/edwh_sshkey_plugin/__about__.py"
@@ -159,3 +158,11 @@ exclude_lines = [
   "if __name__ == .__main__.:",
   "if TYPE_CHECKING:",
 ]
+
+[tool.semantic_release]
+branch = "master"
+version_variable = "src/edwh_sshkey_plugin/__about__.py:__version__"
+change_log = "CHANGELOG.md"
+upload_to_repository = false
+upload_to_release = false
+build_command = "hatch build -c"
