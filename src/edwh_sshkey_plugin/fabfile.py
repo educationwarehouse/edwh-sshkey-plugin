@@ -1,3 +1,5 @@
+import fabric.connection
+import invoke
 from fabric import task
 from datetime import datetime
 from yaml.loader import SafeLoader
@@ -9,6 +11,10 @@ import platform
 
 # the path where the yaml file with the keys is stored
 YAML_KEYS_PATH = pathlib.Path("~/.ssh/known_keys.yaml").expanduser()
+
+
+def local_connection(c):
+    return "invoke" in str(type(c))
 
 
 def create_new_yaml_file_if_not_exists():
@@ -84,7 +90,10 @@ def add_keys_to_remote(c, command_line_keys, all_key_information):
 
         all_key_information_remote_items = all_key_information[command_line_key]
 
-        if all(attr in all_key_information_remote_items for attr in ("key", "datetime", "who@hostname", "message")):
+        if all(
+            attr in all_key_information_remote_items
+            for attr in ("key", "datetime", "who@hostname", "message")
+        ):
             # It puts the keys in the authorized_keys file on the remote server.
             # So the public key is now on the remote server.
             # This means that the user can now log in to the remote server using the private key.
@@ -125,7 +134,9 @@ def remote_key_doesnt_exist(c, command_line_keys, all_key_information):
     # The generate function requires two out of three arguments to be filled in. So that's why the key is split.
     for which_key in not_in_yaml_keys:
         if "-" not in which_key:
-            print(f"\033[1m{which_key}\033[0m isn't a valid host-name please give it up with the format: owner-hostname-goal")
+            print(
+                f"\033[1m{which_key}\033[0m isn't a valid host-name please give it up with the format: owner-hostname-goal"
+            )
             continue
 
         new_key = which_key.replace("-", " ")
@@ -145,7 +156,9 @@ def remote_key_doesnt_exist(c, command_line_keys, all_key_information):
             key_split = new_key.split()
 
             if len(key_split) > 3:
-                print(f"to many arguments given in the key: {which_key} format needs to be: owner-hostname-goal")
+                print(
+                    f"to many arguments given in the key: {which_key} format needs to be: owner-hostname-goal"
+                )
 
             # This is to create a new key, the split is to make sure that the key is in the right format.
             generate(
@@ -156,7 +169,7 @@ def remote_key_doesnt_exist(c, command_line_keys, all_key_information):
                 goal=new_key.split()[2] if len(key_split) == 3 else "",
             )
             # eventually it will add the keys that are just created
-            add_to_remote(c, command_line_keys)
+            add(c, command_line_keys)
 
 
 @task(
@@ -165,7 +178,7 @@ def remote_key_doesnt_exist(c, command_line_keys, all_key_information):
     },
     iterable=["keys_to_remote"],
 )
-def add_to_remote(c, keys_to_remote: list):
+def add(c, keys_to_remote: list):
     """
     Adds the specified SSH key(s) to the remote machine. You can add multiple keys at once.
 
@@ -177,6 +190,15 @@ def add_to_remote(c, keys_to_remote: list):
     If there are keys that are not in the YAML file, the user is prompted to create them.
     NOTE: you must provide a message, otherwise the program will terminate.
     """
+    if local_connection(c):
+        if input("are you sure you want to add local keys(Y/n").replace(
+            " ", ""
+        ) not in ["Y", "y", ""]:
+            print("please use `edwh -H ubuntu@user.nl sshkey.add because ")
+            exit(255)
+        else:
+            print("Adding keys to local known_hosts")
+
     # If keys_to_remote is a string, convert it to a list with a single element
     if type(keys_to_remote) == str:
         keys_to_remote = [keys_to_remote]
@@ -199,10 +221,19 @@ def add_to_remote(c, keys_to_remote: list):
     },
     iterable=["keys_to_remote"],
 )
-def delete_remote(c, keys_to_remote):
+def delete(c, keys_to_remote):
     """
     Removes the specified SSH key(s) from the remote machine. You can remove multiple keys at once.
     """
+    if local_connection(c):
+        if input("are you sure you want to add local keys(Y/n").replace(
+            " ", ""
+        ) not in ["Y", "y", ""]:
+            print("please use `edwh -H ubuntu@user.nl sshkey.delete because ")
+            exit(255)
+        else:
+            print("Removing local keys from known_hosts")
+
     # If keys_to_remote is a string, convert it to a list with a single element
     if isinstance(keys_to_remote, str):
         keys_to_remote = [keys_to_remote]
@@ -243,13 +274,18 @@ def generate(c, message, owner="", hostname="", goal=""):
     You can see who has the private/public key, by looking at the YAML file.
     There is a key called 'who@hostname', that's the person who created the new ssh key.
     """
-    # Create a new YAML file if it does not already exist
-    create_new_yaml_file_if_not_exists()
+    # Get the yaml keys or create a new YAML file if it does not already exist
+    yaml_keys = get_keys_from_keyholder()
+
+    # check if the key "keys" is not in the yaml file if it isnt add it so we can append data to it later
+    if "keys" not in yaml_keys:
+        yaml_keys["keys"] = {}
 
     # Create a key name by joining the non-empty values of owner, hostname, and goal with a hyphen
     key_name = "-".join(_ for _ in (owner, hostname, goal) if _)
+    print(key_name)
     # If less than two of three from owner, hostname, and goal are provided, print an error message and return
-    if '-' in key_name:
+    if "-" not in key_name:
         print(
             "Please provide at least two of the following arguments: Owner, Hostname, goal"
         )
@@ -270,26 +306,30 @@ def generate(c, message, owner="", hostname="", goal=""):
         shell=True,
     )
 
+    yaml_keys = yaml_keys.update(
+        {
+            "key_name": {
+                "key": open(
+                    pathlib.Path(
+                        f"~/.ssh/.managed_ssh_keys-{key_name}.pub"
+                    ).expanduser()
+                ).read(),
+                "datetime": datetime.now().strftime(
+                    "Datum: %Y-%m-%d Tijdstip: %H:%M:%S"
+                ),
+                "who@hostname": f"{os.getlogin()}@{platform.node()}",
+                "message": message,
+            }
+        }
+    )
+
+    print(yaml_keys)
+
     # Open the YAML_KEYS_PATH file in append mode
-    with open(YAML_KEYS_PATH, "a") as f:
+    with open(YAML_KEYS_PATH, "w") as f:
         # Dump the key information to the YAML file
         yaml.dump(
-            {
-                "keys": {
-                    key_name: {
-                        "key": open(
-                            pathlib.Path(
-                                f"~/.ssh/.managed_ssh_keys-{key_name}.pub"
-                            ).expanduser()
-                        ).read(),
-                        "datetime": datetime.today().strftime(
-                            "Datum: %Y-%m-%d Tijdstip: %H:%M:%S"
-                        ),
-                        "who@hostname": f"{os.getlogin()}@{platform.node()}",
-                        "message": message,
-                    }
-                }
-            },
+            yaml_keys,
             f,
             indent=4,
         )
@@ -298,8 +338,8 @@ def generate(c, message, owner="", hostname="", goal=""):
     print(f"Private key saved in ~/.managed_ssh_keys-{key_name}")
 
 
-@task()
-def list(c):
+@task(name="list")
+def list_(c):
     """
     Lists all the local or local and remote ssh_keys.
     This function lists the authorized keys on a remote machine and compares them with the keys in a local YAML file.
@@ -348,7 +388,7 @@ def list(c):
 
     # Display the keys in a table
     if local_keys or remote_known_keys:
-        if local_keys:
+        if local_keys and local_connection(c):
             print("\033[1mLocal Keys\033[0m")
             for key in local_keys:
                 print(f"\033[33m{key}\033[0m")
@@ -357,5 +397,7 @@ def list(c):
             print("\033[1mRemote Keys\033[0m")
             for key in remote_known_keys:
                 print(f"\033[33m{key}\033[0m")
+        elif not local_connection(c):
+            print("\033[1mNo remote keys have been found!\033[0m")
     else:
         print("No keys found in key_holder.yaml")
