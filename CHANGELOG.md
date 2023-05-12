@@ -2,6 +2,11 @@
 
 <!--next-version-placeholder-->
 
+## v0.1.1 (2023-05-12)
+### Fix
+* Some small docs changes ([`94445e2`](https://github.com/educationwarehouse/edwh-sshkey-plugin/commit/94445e2968148e18eaddd14506e8eb1c0b7bd6e9))
+* Now works with the plugin architecture, some minor tweaks required in pyproject.toml ([`bd645ff`](https://github.com/educationwarehouse/edwh-sshkey-plugin/commit/bd645ffadb0523291995cfd2caefeb9c45de567c))
+
 ## v0.1.0 (2023-05-12)
 ### Feature
 * Added documentation ([`332a9ac`](https://github.com/educationwarehouse/edwh-sshkey-plugin/commit/332a9ac25e677eb0c76b98929e61695ce0edbddd))
