@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v0.1.5 (2023-05-15)
+### Fix
+* Fix that some people get a os.getlogin() error, os.getlogin() returns the name of the user logged in on the controlling terminal of the process. Typically processes in user session (tty, X session) have a controlling terminal. Processes spawned by a service manager like init, systemd, or upstart usually do not have a controlling terminal. You have to get the user information by other means. Our documentation for os.getlogin() recommends getpass.getuser(). which is used ([`4437128`](https://github.com/educationwarehouse/edwh-sshkey-plugin/commit/44371287c9a02688b1277517641222845510be13))
+
 ## v0.1.4 (2023-05-15)
 ### Fix
 * Error messages improvements and key generation gives more info with the keys ([`e82a53a`](https://github.com/educationwarehouse/edwh-sshkey-plugin/commit/e82a53a565a7cf1416b4794d10dfbf1eabd4288d))
