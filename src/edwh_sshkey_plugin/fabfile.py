@@ -278,7 +278,7 @@ def generate(c, message, owner="", hostname="", goal=""):
 
     You need a message and 2 out of 3 arguments to generate a new key. (owner, hostname, goal) Otherwise it will fail.
 
-    The private/public key is located local in the ~/.managed_ssh_keys-{key_name} directory.
+    The private and public key is located local in the ~/.managed_ssh_keys-{key_name} directory.
     You can see who has the private/public key, by looking at the YAML file.
     There is a key called 'who@hostname', that's the person who created the new ssh key.
     """
@@ -318,8 +318,8 @@ def generate(c, message, owner="", hostname="", goal=""):
         "key": open(
             pathlib.Path(f"~/.ssh/.managed_ssh_keys-{key_name}.pub").expanduser()
         ).read(),
-        "datetime": datetime.now().strftime("Datum: %Y-%m-%d Tijdstip: %H:%M:%S"),
-        "who@hostname": f"{os.getlogin()}@{platform.node()}",
+        "datetime": curr_time,
+        "who@hostname": host,
         "message": message,
     }
 
