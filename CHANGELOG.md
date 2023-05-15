@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v0.1.4 (2023-05-15)
+### Fix
+* Error messages improvements and key generation gives more info with the keys ([`e82a53a`](https://github.com/educationwarehouse/edwh-sshkey-plugin/commit/e82a53a565a7cf1416b4794d10dfbf1eabd4288d))
+
 ## v0.1.3 (2023-05-15)
 ### Fix
 * Small docs fix ([`6655f04`](https://github.com/educationwarehouse/edwh-sshkey-plugin/commit/6655f045d5a773742de6b37f7df93497d05b3a71))
