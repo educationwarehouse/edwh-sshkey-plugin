@@ -25,7 +25,7 @@ pip install edwh-sshkey-plugin
 ### Generating new keys:
 example for ubuntu@user.nl
 ```console
-edwh sshkey.generate --message={message} --owner=ubuntu --hostname=user --doel=nl
+edwh sshkey.generate --message={message} --owner=ubuntu --hostname=user --goal=nl
 ```
 
 possible arguments for `ew sshkey.generate`:
