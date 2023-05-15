@@ -2,6 +2,13 @@
 
 <!--next-version-placeholder-->
 
+## v0.1.3 (2023-05-15)
+### Fix
+* Small docs fix ([`6655f04`](https://github.com/educationwarehouse/edwh-sshkey-plugin/commit/6655f045d5a773742de6b37f7df93497d05b3a71))
+* Removal of debug messages ([`4ef8861`](https://github.com/educationwarehouse/edwh-sshkey-plugin/commit/4ef8861d364041f11c3ec5598c40015400f7de24))
+* List shadow, -remote remote because of also being able to run local, show text if running local, showing key_names during listing keys, able to list private keys, bug where keys where the "keys: " was added per generation of an key ([`2c0fabd`](https://github.com/educationwarehouse/edwh-sshkey-plugin/commit/2c0fabdca2bab14ca1e206b08f967130d86ffa2b))
+* Local and remote are now somewhat separated + eod ([`a040491`](https://github.com/educationwarehouse/edwh-sshkey-plugin/commit/a0404917d3f6faad156e6a8b1605ca78babffa2a))
+
 ## v0.1.2 (2023-05-12)
 ### Fix
 * Prevents an error on list of an empty key file. ([`6369365`](https://github.com/educationwarehouse/edwh-sshkey-plugin/commit/6369365def512e55c7cc1eba43940d6bea840fef))
