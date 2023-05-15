@@ -33,7 +33,7 @@ def open_new_keyholder(read: bool):
     return YAML_KEYS_PATH.open("r" if read else "w")
 
 
-def get_keys_from_keyholder() -> dict:
+def get_keys_from_keyholder(gen=False) -> dict:
     """
     This function retrieves keys from a keyholder.
 
@@ -48,11 +48,16 @@ def get_keys_from_keyholder() -> dict:
     key_db: dict = yaml.load(key_holder, Loader=SafeLoader)
     # This checks if the keyholder is empty. If empty -> exit with code 255
     if key_db is None:
+        print("is it?")
+        if gen:
+            return {}
+
         print(
             "functionality for generating local keys automaticly and adding them to the keyholder currently isn't supported"
         )
         print("please run `ew sshkey.generate` to generate a new key")
         exit(255)
+
     # This returns a dictionary of keys from the keyholder.
     return dict(key_db.setdefault("keys"))
 
@@ -275,11 +280,8 @@ def generate(c, message, owner="", hostname="", goal=""):
     There is a key called 'who@hostname', that's the person who created the new ssh key.
     """
     # Get the yaml keys or create a new YAML file if it does not already exist
-    yaml_keys = get_keys_from_keyholder()
-
-    # check if the key "keys" is not in the yaml file if it isnt add it so we can append data to it later
-    if "keys" not in yaml_keys:
-        yaml_keys["keys"] = {}
+    keys_dict = {"keys": {}}
+    current_keys = get_keys_from_keyholder(gen=True)
 
     # Create a key name by joining the non-empty values of owner, hostname, and goal with a hyphen
     key_name = "-".join(_ for _ in (owner, hostname, goal) if _)
@@ -305,31 +307,22 @@ def generate(c, message, owner="", hostname="", goal=""):
         f'ssh-keygen -t rsa -b 4096 -f ~/.ssh/.managed_ssh_keys-{key_name} -N "" -C "{message}"',
         shell=True,
     )
+    keys_dict["keys"].update(current_keys)
+    keys_dict["keys"][key_name] = {
+        "key": open(
+            pathlib.Path(f"~/.ssh/.managed_ssh_keys-{key_name}.pub").expanduser()
+        ).read(),
+        "datetime": datetime.now().strftime("Datum: %Y-%m-%d Tijdstip: %H:%M:%S"),
+        "who@hostname": f"{os.getlogin()}@{platform.node()}",
+        "message": message,
+    }
 
-    yaml_keys = yaml_keys.update(
-        {
-            "key_name": {
-                "key": open(
-                    pathlib.Path(
-                        f"~/.ssh/.managed_ssh_keys-{key_name}.pub"
-                    ).expanduser()
-                ).read(),
-                "datetime": datetime.now().strftime(
-                    "Datum: %Y-%m-%d Tijdstip: %H:%M:%S"
-                ),
-                "who@hostname": f"{os.getlogin()}@{platform.node()}",
-                "message": message,
-            }
-        }
-    )
-
-    print(yaml_keys)
 
     # Open the YAML_KEYS_PATH file in append mode
     with open(YAML_KEYS_PATH, "w") as f:
         # Dump the key information to the YAML file
         yaml.dump(
-            yaml_keys,
+            keys_dict,
             f,
             indent=4,
         )
@@ -338,15 +331,35 @@ def generate(c, message, owner="", hostname="", goal=""):
     print(f"Private key saved in ~/.managed_ssh_keys-{key_name}")
 
 
+def get_keys(c, private):
+    if not private:
+        return get_keys_from_keyholder()
+
+    key_names = get_keys_from_keyholder()
+    keys = {}
+    for key_name in key_names:
+        # we should only be able to find 1 key
+        private_key_file = pathlib.Path(f"~/.ssh/.managed_ssh_keys-{key_name}").expanduser()
+
+        if private_key_file is None:
+            print(f"[ERROR] private key for {key_name} not found!")
+            print("exiting....")
+            exit(1)
+
+            # reinact yaml file so we don't need to parse this differently
+        keys[key_name] = {"key": private_key_file.read_text()}
+    return keys
+
+
 @task(name="list")
-def list_(c):
+def list_(c, private=False):
     """
     Lists all the local or local and remote ssh_keys.
     This function lists the authorized keys on a remote machine and compares them with the keys in a local YAML file.
     It separates the keys into three categories: local keys, remote known keys, and unrecognized keys.
     """
     # Load the keys from the YAML file
-    all_key_information = get_keys_from_keyholder()
+    all_key_information = get_keys(c, private)
 
     # Get the list of authorized keys from the remote machine
     if len(c.run("ls ~/.ssh/authorized_keys", warn=True, hide=True).stdout) > 0:
@@ -355,14 +368,17 @@ def list_(c):
         remote_keys = ""
 
     # Iterate through the keys and separate them into two lists
+    key_names = {}
     local_keys = []
     remote_known_keys = []
-    for key_data in all_key_information.values():
+    for key in all_key_information.keys():
+        key_data = all_key_information[key]
         if key_data["key"] in remote_keys:
             remote_known_keys.append(key_data["key"].replace("\n", ""))
         else:
             local_keys.append(key_data["key"])
 
+        key_names[key_data["key"]] = key
     remote_keys = remote_keys.split("\n")
 
     # Check for any unrecognized keys in the authorized_keys file
@@ -391,11 +407,13 @@ def list_(c):
         if local_keys and local_connection(c):
             print("\033[1mLocal Keys\033[0m")
             for key in local_keys:
+                print(f"Key {key_names[key]}:")
                 print(f"\033[33m{key}\033[0m")
 
         if remote_known_keys:
             print("\033[1mRemote Keys\033[0m")
             for key in remote_known_keys:
+                print(f"Key {key_names[key]}:")
                 print(f"\033[33m{key}\033[0m")
         elif not local_connection(c):
             print("\033[1mNo remote keys have been found!\033[0m")
