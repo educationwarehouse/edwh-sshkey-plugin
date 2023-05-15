@@ -233,7 +233,7 @@ def delete(c, keys_to_remote):
         if input("are you sure you want to add local keys(Y/n").replace(
             " ", ""
         ) not in ["Y", "y", ""]:
-            print("please use `edwh -H ubuntu@user.nl sshkey.delete because ")
+            print("please use `edwh -H ubuntu@user.nl sshkey.delete to remove remote keys ")
             exit(255)
         else:
             print("Removing local keys from known_hosts")
@@ -258,6 +258,8 @@ def delete(c, keys_to_remote):
         c.run("mv ~/.ssh/keys ~/.ssh/authorized_keys")
         # Print a success message
         print(f"Success! The {command_line_key} key has been removed.")
+    else:
+        print("please give up keys using edwh.sshkey.delete -k [keys]")
 
 
 @task(
@@ -265,7 +267,7 @@ def delete(c, keys_to_remote):
         "message": "a message to know what the key is used for, REQUIRED",
         "owner": "owner of the server you are generating a key for",
         "hostname": "hostname of the server you are generating the key for",
-        "goal": "What is the goal to use this key for, for example: 'production' or 'testing''",
+        "goal": "What is the goal to use this key for, for example: 'production' or 'testing'",
     }
 )
 def generate(c, message, owner="", hostname="", goal=""):
@@ -314,7 +316,6 @@ def generate(c, message, owner="", hostname="", goal=""):
         "who@hostname": f"{os.getlogin()}@{platform.node()}",
         "message": message,
     }
-
 
     # Open the YAML_KEYS_PATH file in append mode
     with open(YAML_KEYS_PATH, "w") as f:

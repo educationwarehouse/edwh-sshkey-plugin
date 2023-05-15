@@ -30,9 +30,9 @@ edwh sshkey.generate --message={message} --owner=ubuntu --hostname=user --doel=n
 
 possible arguments for `ew sshkey.generate`:
 - **message**: REQUIRED, message to give with the ssh-keygen
-- **owner**: ubuntu if ubuntu@user.nl
-- **hostname**: user if ubuntu@user.nl
-- **goal**: nl if ubuntu@user.nl
+- **owner**: owner of the server you are generating a key for
+- **hostname**: hostname of the server you are generating the key for
+- **goal**: What is the goal to use this key for, for example: 'production' or 'testing'
 
 #### note:
 you atleast need to give this function 2-3 parameters and a message else it will not work.
