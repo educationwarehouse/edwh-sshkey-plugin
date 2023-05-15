@@ -163,6 +163,7 @@ def remote_key_doesnt_exist(c, command_line_keys, all_key_information):
                 print(
                     f"to many arguments given in the key: {which_key} format needs to be: owner-hostname-goal"
                 )
+                exit(1)
 
             # This is to create a new key, the split is to make sure that the key is in the right format.
             generate(
@@ -195,7 +196,7 @@ def add(c, keys_to_remote: list):
     NOTE: you must provide a message, otherwise the program will terminate.
     """
     if local_connection(c):
-        if input("are you sure you want to add local keys(Y/n").replace(
+        if input("are you sure you want to add local keys(Y/n): ").replace(
             " ", ""
         ) not in ["Y", "y", ""]:
             print("please use `edwh -H ubuntu@user.nl sshkey.add because ")
@@ -303,8 +304,12 @@ def generate(c, message, owner="", hostname="", goal=""):
     # The key is saved in ~/.ssh/.managed_ssh_keys-{key_name}
     # The key has no passphrase
     # The key has given a comment with the message
+    curr_time = datetime.now().strftime("Datum: %Y-%m-%d Tijdstip: %H:%M:%S")
+    host = f"{os.getlogin()}@{platform.node()}"
+
     subprocess.run(
-        f'ssh-keygen -t rsa -b 4096 -f ~/.ssh/.managed_ssh_keys-{key_name} -N "" -C "{message}"',
+        f'ssh-keygen -t rsa -b 4096 -f ~/.ssh/.managed_ssh_keys-{key_name} -N "" -C "key name: {key_name} '
+        f'message: {message} who@hostname: {host} {curr_time}"',
         shell=True,
     )
     keys_dict["keys"].update(current_keys)
