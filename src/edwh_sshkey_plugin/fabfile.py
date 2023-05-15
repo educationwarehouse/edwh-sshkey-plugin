@@ -48,7 +48,6 @@ def get_keys_from_keyholder(gen=False) -> dict:
     key_db: dict = yaml.load(key_holder, Loader=SafeLoader)
     # This checks if the keyholder is empty. If empty -> exit with code 255
     if key_db is None:
-        print("is it?")
         if gen:
             return {}
 
@@ -285,7 +284,6 @@ def generate(c, message, owner="", hostname="", goal=""):
 
     # Create a key name by joining the non-empty values of owner, hostname, and goal with a hyphen
     key_name = "-".join(_ for _ in (owner, hostname, goal) if _)
-    print(key_name)
     # If less than two of three from owner, hostname, and goal are provided, print an error message and return
     if "-" not in key_name:
         print(
