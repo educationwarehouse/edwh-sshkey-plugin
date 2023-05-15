@@ -8,6 +8,7 @@ import yaml
 import os
 import subprocess
 import platform
+import getpass
 
 # the path where the yaml file with the keys is stored
 YAML_KEYS_PATH = pathlib.Path("~/.ssh/known_keys.yaml").expanduser()
@@ -305,7 +306,7 @@ def generate(c, message, owner="", hostname="", goal=""):
     # The key has no passphrase
     # The key has given a comment with the message
     curr_time = datetime.now().strftime("Datum: %Y-%m-%d Tijdstip: %H:%M:%S")
-    host = f"{os.getlogin()}@{platform.node()}"
+    host = f"{getpass.getuser()}@{platform.node()}"
 
     subprocess.run(
         f'ssh-keygen -t rsa -b 4096 -f ~/.ssh/.managed_ssh_keys-{key_name} -N "" -C "key name: {key_name} '
