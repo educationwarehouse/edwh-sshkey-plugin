@@ -315,9 +315,7 @@ def generate(c, message, owner="", hostname="", goal=""):
     )
     keys_dict["keys"].update(current_keys)
     keys_dict["keys"][key_name] = {
-        "key": open(
-            pathlib.Path(f"~/.ssh/.managed_ssh_keys-{key_name}.pub").expanduser()
-        ).read(),
+        "key": pathlib.Path(f"~/.ssh/.managed_ssh_keys-{key_name}.pub").expanduser().read_text(),
         "datetime": curr_time,
         "who@hostname": host,
         "message": message,
