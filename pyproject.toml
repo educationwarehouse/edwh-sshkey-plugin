@@ -33,9 +33,9 @@ dev = [
 ]
 
 [project.urls]
-Documentation = "https://github.com/remcoboerma/edwh_sshkey_plugin#readme"
-Issues = "https://github.com/remcoboerma/edwh_sshkey_plugin/issues"
-Source = "https://github.com/remcoboerma/edwh_sshkey_plugin"
+Documentation = "https://github.com/educationwarehouse/edwh-sshkey-plugin#readme"
+Issues = "https://github.com/educationwarehouse/edwh-sshkey-plugin/issues"
+Source = "https://github.com/educationwarehouse/edwh-sshkey-plugin"
 
 # https://packaging.python.org/en/latest/guides/creating-and-discovering-plugins/#using-package-metadata
 [project.entry-points."edwh.tasks"]
