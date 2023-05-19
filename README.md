@@ -19,7 +19,7 @@
 
 To install all edwh related plugins
 ```console
-pipx install edwh[plugins,all,omgeving]
+pipx install edwh[plugins,omgeving]
 ```
 
 To only install edwh sshkey plugin
