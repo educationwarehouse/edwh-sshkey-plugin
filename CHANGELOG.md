@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v0.1.7 (2023-05-19)
+### Documentation
+* 'all' is not an existing 'extra' ([`13dd88c`](https://github.com/educationwarehouse/edwh-sshkey-plugin/commit/13dd88c857f7ea8b3d7a3bf2b8f006bad1647e47))
+
 ## v0.1.6 (2023-05-19)
 ### Fix
 * Ssh-key and sshkey being used separate now only sshkey. Also added git ignore to remove __pycache__ and .idea ([`a47d082`](https://github.com/educationwarehouse/edwh-sshkey-plugin/commit/a47d082e723f83f4b02625f6237069f1104248bb))
