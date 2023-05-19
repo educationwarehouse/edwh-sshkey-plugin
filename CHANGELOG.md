@@ -2,6 +2,16 @@
 
 <!--next-version-placeholder-->
 
+## v0.1.6 (2023-05-19)
+### Fix
+* Ssh-key and sshkey being used separate now only sshkey. Also added git ignore to remove __pycache__ and .idea ([`a47d082`](https://github.com/educationwarehouse/edwh-sshkey-plugin/commit/a47d082e723f83f4b02625f6237069f1104248bb))
+* Message requirement change, now you don't need to fill it in but it will still give you a prompt if not filled in now just custom ([`08460fe`](https://github.com/educationwarehouse/edwh-sshkey-plugin/commit/08460fe1e05ef771cb97a4b7b7eab3eff023b24f))
+* Installation guide being incorrect ([`19a9e15`](https://github.com/educationwarehouse/edwh-sshkey-plugin/commit/19a9e153becb99fa322a3eaec8cc46ec9b061607))
+* Project.urls now go to the correct urls ([`cdfb180`](https://github.com/educationwarehouse/edwh-sshkey-plugin/commit/cdfb180e934fb2c60de9c01c0d648870af9526ac))
+* Optional dependencies not in pyproject.toml. so new .[dev] installable ([`b36c45e`](https://github.com/educationwarehouse/edwh-sshkey-plugin/commit/b36c45ed459efee159342ca8514484731b8a9546))
+* Open.read() -> pathlib readlines ([`46b4a22`](https://github.com/educationwarehouse/edwh-sshkey-plugin/commit/46b4a2288b3a0ffe0515b9ae37ad25ff49a7244d))
+* Documentation ([`7b96edc`](https://github.com/educationwarehouse/edwh-sshkey-plugin/commit/7b96edcb5078b4af79a1291f96c1f1a601060794))
+
 ## v0.1.5 (2023-05-15)
 ### Fix
 * Fix that some people get a os.getlogin() error, os.getlogin() returns the name of the user logged in on the controlling terminal of the process. Typically processes in user session (tty, X session) have a controlling terminal. Processes spawned by a service manager like init, systemd, or upstart usually do not have a controlling terminal. You have to get the user information by other means. Our documentation for os.getlogin() recommends getpass.getuser(). which is used ([`4437128`](https://github.com/educationwarehouse/edwh-sshkey-plugin/commit/44371287c9a02688b1277517641222845510be13))
