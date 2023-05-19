@@ -153,7 +153,7 @@ def remote_key_doesnt_exist(c, command_line_keys, all_key_information):
             "",
         ):
             generate_message = str(
-                input("What message do you want to go with the ssh-key? REQUIRED: ")
+                input("What message do you want to go with the sshkey? REQUIRED: ")
             )
             if not generate_message:
                 print("Please give up a message for the next time!")

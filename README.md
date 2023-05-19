@@ -35,7 +35,7 @@ edwh sshkey.generate --message={message} --owner=ubuntu --hostname=user --goal=n
 ```
 
 possible arguments for `ew sshkey.generate`:
-- **message**: REQUIRED, message to give with the ssh-keygen
+- **message**: REQUIRED, message to give with the generated key
 - **owner**: owner of the server you are generating a key for
 - **hostname**: hostname of the server you are generating the key for
 - **goal**: What is the goal to use this key for, for example: 'production' or 'testing'
@@ -78,4 +78,4 @@ edwh sshkey.list -H ubuntu@user.nl
 this list all found known and unknown keys on the local or remote server.
 
 ## License
-`edwh-ssh-key-plugin` is distributed under the terms of the [MIT](https://spdx.org/licenses/MIT.html) license.
+`edwh-sshkey-plugin` is distributed under the terms of the [MIT](https://spdx.org/licenses/MIT.html) license.
