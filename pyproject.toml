@@ -25,6 +25,13 @@ classifiers = [
 ]
 dependencies = ['invoke']
 
+[project.optional-dependencies]
+dev = [
+    "hatch",
+    # "python-semantic-release",
+    "black",
+]
+
 [project.urls]
 Documentation = "https://github.com/remcoboerma/edwh_sshkey_plugin#readme"
 Issues = "https://github.com/remcoboerma/edwh_sshkey_plugin/issues"
