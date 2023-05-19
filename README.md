@@ -17,8 +17,14 @@
 
 ## Installation
 
+To install all edwh related plugins
 ```console
-pip install edwh-sshkey-plugin
+pipx install edwh[plugins,all,omgeving]
+```
+
+To only install edwh sshkey plugin
+```console
+pipx install edwh[sshkey]
 ```
 
 ## Guide
