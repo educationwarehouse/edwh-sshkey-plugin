@@ -272,7 +272,7 @@ def delete(c, keys_to_remote):
         "goal": "What is the goal to use this key for, for example: 'production' or 'testing'",
     }
 )
-def generate(c, message, owner="", hostname="", goal=""):
+def generate(c, message="", owner="", hostname="", goal=""):
     """
     This function generates a new SSH key and saves it to a yaml file. (~/.ssh/known_keys.yaml)
 
@@ -282,6 +282,10 @@ def generate(c, message, owner="", hostname="", goal=""):
     You can see who has the private/public key, by looking at the YAML file.
     There is a key called 'who@hostname', that's the person who created the new ssh key.
     """
+
+    if not message:
+        print("please use `edwh sshkey.generate -m {message} {required args}` to proceed")
+
     # Get the yaml keys or create a new YAML file if it does not already exist
     keys_dict = {"keys": {}}
     current_keys = get_keys_from_keyholder(gen=True)
