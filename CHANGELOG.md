@@ -2,6 +2,12 @@
 
 <!--next-version-placeholder-->
 
+## v0.1.8 (2025-07-04)
+
+### Fix
+
+* Use `edwh.task` instead of `fabric.task` ([`008120f`](https://github.com/educationwarehouse/edwh-sshkey-plugin/commit/008120f08f2eca4afedd9438855f454abd8d6e5b))
+
 ## v0.1.7 (2023-05-19)
 ### Documentation
 * 'all' is not an existing 'extra' ([`13dd88c`](https://github.com/educationwarehouse/edwh-sshkey-plugin/commit/13dd88c857f7ea8b3d7a3bf2b8f006bad1647e47))
