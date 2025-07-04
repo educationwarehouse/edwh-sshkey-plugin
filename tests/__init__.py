@@ -2,11 +2,11 @@
 #
 # SPDX-License-Identifier: MIT
 
-from ..src.edwh_sshkey_plugin import fabfile
 import unittest
 
-import unittest
 from src.edwh_sshkey_plugin import fabfile
+
+from ..src.edwh_sshkey_plugin import fabfile
 
 
 class TestYourModule(unittest.TestCase):
@@ -29,5 +29,3 @@ class TestYourModule(unittest.TestCase):
         with fabfile.open_new_keyholder(read=False) as f:
             # Assert that the file was opened successfully
             self.assertIsNotNone(f)
-
-

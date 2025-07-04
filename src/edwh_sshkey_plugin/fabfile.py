@@ -1,14 +1,12 @@
-import fabric.connection
-import invoke
-from fabric import task
-from datetime import datetime
-from yaml.loader import SafeLoader
-import pathlib
-import yaml
-import os
-import subprocess
-import platform
 import getpass
+import pathlib
+import platform
+import subprocess
+from datetime import datetime
+
+import yaml
+from edwh import task
+from yaml.loader import SafeLoader
 
 # the path where the yaml file with the keys is stored
 YAML_KEYS_PATH = pathlib.Path("~/.ssh/known_keys.yaml").expanduser()
@@ -95,24 +93,17 @@ def add_keys_to_remote(c, command_line_keys, all_key_information):
 
         all_key_information_remote_items = all_key_information[command_line_key]
 
-        if all(
-            attr in all_key_information_remote_items
-            for attr in ("key", "datetime", "who@hostname", "message")
-        ):
+        if all(attr in all_key_information_remote_items for attr in ("key", "datetime", "who@hostname", "message")):
             # It puts the keys in the authorized_keys file on the remote server.
             # So the public key is now on the remote server.
             # This means that the user can now log in to the remote server using the private key.
-            c.run(
-                f'echo "{all_key_information_remote_items["key"]}" >> ~/.ssh/authorized_keys'
-            )
+            c.run(f'echo "{all_key_information_remote_items["key"]}" >> ~/.ssh/authorized_keys')
             # This is a way to check if the key is already in the authorized_keys file.
             # By making another file with all the keys and call the function 'sort -u' on it.
             # This function sorts the keys and removes duplicates.
             c.run("sort -u ~/.ssh/authorized_keys > ~/.ssh/keys")
             c.run("mv ~/.ssh/keys ~/.ssh/authorized_keys")
-            print(
-                f"It worked out! The \033[1m{command_line_key}\033[0m key is added to the remote server."
-            )
+            print(f"It worked out! The \033[1m{command_line_key}\033[0m key is added to the remote server.")
 
 
 def remote_key_doesnt_exist(c, command_line_keys, all_key_information):
@@ -126,13 +117,9 @@ def remote_key_doesnt_exist(c, command_line_keys, all_key_information):
     """
     # removing all keys that are already in the yaml file, so we can create the ones that are not in the yaml file
     # and then add them to the yaml file
-    not_in_yaml_keys = [
-        which_key
-        for which_key in command_line_keys
-        if which_key not in all_key_information.keys()
-    ]
+    not_in_yaml_keys = [which_key for which_key in command_line_keys if which_key not in all_key_information.keys()]
     print(
-        f'Wrong \033[1m{" ".join(not_in_yaml_keys)}\033[0m key, '
+        f"Wrong \033[1m{' '.join(not_in_yaml_keys)}\033[0m key, "
         f"first check if you filled in the right key. Or if it is in the YAML file."
     )
     # Here is the '-' replaced with a space, so it can be used in the generate function.
@@ -152,18 +139,14 @@ def remote_key_doesnt_exist(c, command_line_keys, all_key_information):
             "Y",
             "",
         ):
-            generate_message = str(
-                input("What message do you want to go with the sshkey? REQUIRED: ")
-            )
+            generate_message = str(input("What message do you want to go with the sshkey? REQUIRED: "))
             if not generate_message:
                 print("Please give up a message for the next time!")
                 exit(1)
             key_split = new_key.split()
 
             if len(key_split) > 3:
-                print(
-                    f"to many arguments given in the key: {which_key} format needs to be: owner-hostname-goal"
-                )
+                print(f"to many arguments given in the key: {which_key} format needs to be: owner-hostname-goal")
                 exit(1)
 
             # This is to create a new key, the split is to make sure that the key is in the right format.
@@ -197,9 +180,7 @@ def add(c, keys_to_remote: list):
     NOTE: you must provide a message, otherwise the program will terminate.
     """
     if local_connection(c):
-        if input("are you sure you want to add local keys(Y/n): ").replace(
-            " ", ""
-        ) not in ["Y", "y", ""]:
+        if input("are you sure you want to add local keys(Y/n): ").replace(" ", "") not in ["Y", "y", ""]:
             print("please use `edwh -H ubuntu@user.nl sshkey.add because ")
             exit(255)
         else:
@@ -232,9 +213,7 @@ def delete(c, keys_to_remote):
     Removes the specified SSH key(s) from the remote machine. You can remove multiple keys at once.
     """
     if local_connection(c):
-        if input("are you sure you want to add local keys(Y/n").replace(
-            " ", ""
-        ) not in ["Y", "y", ""]:
+        if input("are you sure you want to add local keys(Y/n").replace(" ", "") not in ["Y", "y", ""]:
             print("please use `edwh -H ubuntu@user.nl sshkey.delete to remove remote keys ")
             exit(255)
         else:
@@ -294,9 +273,7 @@ def generate(c, message="", owner="", hostname="", goal=""):
     key_name = "-".join(_ for _ in (owner, hostname, goal) if _)
     # If less than two of three from owner, hostname, and goal are provided, print an error message and return
     if "-" not in key_name:
-        print(
-            "Please provide at least two of the following arguments: Owner, Hostname, goal"
-        )
+        print("Please provide at least two of the following arguments: Owner, Hostname, goal")
         return
 
     # If a file with the specified key name already exists, print an error message and return
@@ -391,20 +368,16 @@ def list_(c, private=False):
     # Check for any unrecognized keys in the authorized_keys file
     if len(c.run("ls ~/.ssh/authorized_keys", warn=True, hide=True).stdout) > 0:
         unrecognized_keys = [
-            remote_key
-            for remote_key in remote_keys
-            if remote_key not in remote_known_keys and remote_key != ""
+            remote_key for remote_key in remote_keys if remote_key not in remote_known_keys and remote_key != ""
         ]
     else:
-        unrecognized_keys = [
-            remote_key for remote_key in remote_keys if remote_key != ""
-        ]
+        unrecognized_keys = [remote_key for remote_key in remote_keys if remote_key != ""]
 
     if unrecognized_keys:
         print("\033[1mUnrecognized keys found in remote auth_keys:\033[0m")
         # If there are unrecognized keys, print them with a number, so you can see how many there are.
         for index in range(len(unrecognized_keys)):
-            print(f"key {index+1}")
+            print(f"key {index + 1}")
             print(unrecognized_keys[index])
             print()
         print()
