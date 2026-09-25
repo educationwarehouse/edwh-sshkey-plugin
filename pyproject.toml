@@ -1,10 +1,9 @@
 [build-system]
-requires = ["hatchling"]
-build-backend = "hatchling.build"
+requires = ["uv_build"]
+build-backend = "uv_build"
 
 [project]
 name = "edwh-sshkey-plugin"
-dynamic = ["version"]
 description = 'plugin for adding and removing keys to servers'
 readme = "README.md"
 requires-python = ">=3.10"
@@ -24,11 +23,10 @@ classifiers = [
   "Programming Language :: Python :: Implementation :: PyPy",
 ]
 dependencies = ['invoke']
+version = "0.1.8"
 
 [project.optional-dependencies]
 dev = [
-    "hatch",
-    # "python-semantic-release",
     "black",
 ]
 
@@ -40,52 +38,6 @@ Source = "https://github.com/educationwarehouse/edwh-sshkey-plugin"
 # https://packaging.python.org/en/latest/guides/creating-and-discovering-plugins/#using-package-metadata
 [project.entry-points."edwh.tasks"]
 sshkey = "edwh_sshkey_plugin.fabfile"
-
-[tool.hatch.version]
-path = "src/edwh_sshkey_plugin/__about__.py"
-
-[tool.hatch.envs.default]
-dependencies = [
-  "coverage[toml]>=6.5",
-  "pytest",
-]
-[tool.hatch.envs.default.scripts]
-test = "pytest {args:tests}"
-test-cov = "coverage run -m pytest {args:tests}"
-cov-report = [
-  "- coverage combine",
-  "coverage report",
-]
-cov = [
-  "test-cov",
-  "cov-report",
-]
-
-[[tool.hatch.envs.all.matrix]]
-python = ["3.7", "3.8", "3.9", "3.10", "3.11"]
-
-[tool.hatch.envs.lint]
-detached = true
-dependencies = [
-  "black>=23.1.0",
-  "mypy>=1.0.0",
-  "ruff>=0.0.243",
-]
-[tool.hatch.envs.lint.scripts]
-typing = "mypy --install-types --non-interactive {args:src/edwh_sshkey_plugin tests}"
-style = [
-  "ruff {args:.}",
-  "black --check --diff {args:.}",
-]
-fmt = [
-  "black {args:.}",
-  "ruff --fix {args:.}",
-  "style",
-]
-all = [
-  "style",
-  "typing",
-]
 
 [tool.black]
 target-version = ["py37"]
@@ -167,10 +119,48 @@ exclude_lines = [
   "if TYPE_CHECKING:",
 ]
 
-[tool.semantic_release]
+[tool.vommit]
+allow_breaking_bang = true
+allow_breaking_footer = true
+prerelease_token = "beta"
+confirm = true
+ignore = []
+
+[tool.vommit.git]
+enabled = true
+origin = "origin"
 branch = "master"
-version_variable = "src/edwh_sshkey_plugin/__about__.py:__version__"
-change_log = "CHANGELOG.md"
-upload_to_repository = false
-upload_to_release = false
-build_command = "hatch build -c"
+on_wrong_branch = "error"
+tag_format = "v{version}"
+commit_format = "{version}"
+
+[tool.vommit.changelog]
+enabled = true
+file = "CHANGELOG.md"
+include_prereleases = false
+placeholder = "<!--next-version-placeholder-->"
+placeholder_regex = "<auto>"
+entry_title_format = "## v{version} ({date:%Y-%m-%d})"
+
+[tool.vommit.changelog.levels]
+feat = "Feature{s}"
+fix = "Fix{es}"
+break = "Breaking Change{s}"
+docs = "Documentation"
+perf = "Performance"
+
+[tool.vommit.pypi]
+enabled = true
+use_keyring = true
+
+[tool.vommit.commands]
+clean = "rm -rf ./dist"
+build = "uv build"
+publish = "uv publish"
+post_publish = ""
+
+[tool.vommit.version_bump_map]
+break = "major"
+feat = "minor"
+fix = "patch"
+perf = "patch"
